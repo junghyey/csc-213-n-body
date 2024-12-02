@@ -165,15 +165,15 @@ int main(int argc, char** argv){
     calculate_force(1, 0, N);
    
 
-    for (int i = 0; i < N * N; i++){
-        printf("%d\n", i);
-        for (int j = 0; j < 3; j++)
-        {
+    // for (int i = 0; i < N * N; i++){
+    //     printf("%d\n", i);
+    //     for (int j = 0; j < 3; j++)
+    //     {
 
-            printf("%lf", i, forces[i][j]);
-        }
-        printf("\n");
-    }
+    //         printf("%lf", i, forces[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
     printf("\n");
 
@@ -186,7 +186,9 @@ int main(int argc, char** argv){
     printf("==========afer update ===================\n");
 
     update_body(0, time_step);
+    update_body(1, time_step);
     print_object(0);
+    print_object(1);
 
     return 0;
 }
