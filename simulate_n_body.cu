@@ -237,9 +237,66 @@ cudaFree(n_bodies_gpu);
 
 
 int main(int argc, char** argv){
+    
+    if (argc != 4) {
+
+    fprintf(stderr, "Usage: %s <input file name> <timestep> <duration>\n", argv[0]);
+
+    exit(1);
+
+  }
+
+  // Try to open the input file
+
+  FILE* input = fopen(argv[1], "r");
+
+  if (input == NULL) {
+
+    fprintf(stderr, "Failed to open input file %s.\n", argv[1]);
+
+    perror(NULL);
+
+    exit(2);
+
+  }
+
+ body_t *n_bodies = (body_t *)malloc(sizeof(body_t) * N);
+
+  char* line = NULL;
+
+  size_t line_capacity = 0;
+
+  while (getline(&line, &line_capacity, input) > 0) {
+    body_t body = {.mass = 0, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
+
+    char *token = strtok(line, ",");
+
+    int counter = 0;
+    while (token != NULL)
+    {
+     switch(counter){
+        case 0:
+            body.mass = 
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+     }
+        token = strtok(NULL, ",");
+    }
+
+    return 0;
+
+}
+
+
+
     int N = 2;
     
-    body_t *n_bodies = (body_t *)malloc(sizeof(body_t) * N);
+   
     double (*forces) [3] = (double(*)[3])malloc(N * N* sizeof(double[3]));
     body_t body1 = {.mass = 500, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
     body_t body2 = {.mass = 100, .position = {4, 3, 0}, .velocity = { 0, 0, 0 }};
