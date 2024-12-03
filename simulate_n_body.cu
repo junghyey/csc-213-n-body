@@ -75,7 +75,7 @@ __global__ void calculate_force ( int N, body_t *n_bodies, double (*forces) [3])
     double F_z = F_mag * (dz / distance);
 
     //printf("body %lu\n", index1);
-    printf("F_x: %lf, F_y: %lf, F_z: %lf\n", F_x, F_y, F_z);
+  //  printf("F_x: %lf, F_y: %lf, F_z: %lf\n", F_x, F_y, F_z);
 
     forces[index1 * N + index2][0] = F_x;
     forces[index1 * N + index2][1] = F_y;
@@ -161,6 +161,31 @@ void print_object(int index, body_t *n_bodies, double (*forces) [3]){
     printf("\n");
 
 }
+__global__  void print_object_gpu(int index, body_t *n_bodies, double (*forces) [3]){
+
+    printf("Body %d\n", index);
+    printf("Mass: %lf \n", n_bodies[index].mass);
+    printf("Position:\n");
+    for (int i = 0; i < 3; i++)
+    {
+        printf("%lf, ", n_bodies[index].position[i]);
+    }
+    printf("\n");
+    printf("Velocity:\n");
+    for (int i = 0; i < 3; i++)
+    {
+        printf("%lf, ", n_bodies[index].velocity[i]);
+    }
+    printf("\n");
+    printf("Net Force:\n");
+    for (int i = 0; i < 3; i++)
+    {
+        printf("%lf, ", n_bodies[index].net_force[i]);
+    }
+    printf("\n");
+
+}
+
 
 void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_bodies, int iter_num){
 
@@ -208,7 +233,11 @@ for (int i = 0; i < iter_num; i++){
     fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(cudaPeekAtLastError()));
   }
 
-  
+    for (int i = 0; i < N; i++){
+        print_object_gpu<<<1,N>>>(i, n_bodies_gpu, gpu_force);
+
+     }
+        
 
 }
 
