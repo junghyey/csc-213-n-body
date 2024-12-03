@@ -49,13 +49,17 @@ __global__ void calculate_force ( int N, body_t *n_bodies, double (*forces) [3])
         forces[index1 * N + index1][2] = 0;
         return;
     }
+
     // calculate magnitude
     body_t body1 = n_bodies[index1];
     body_t body2 = n_bodies[index2];
-    
- 
-    printf("distance \n");
-    printf("x: %lf\n",body2.position[0]);
+
+   if(body1.position[0] == body2.position[0] 
+   && body1.position[1] == body2.position[1] 
+   && body1.position[2] == body2.position[2] 
+   ){
+    printf("The initial position of two objects are same, (COLLISION) UNDEFINED BEHAVIOR.\nThe calculation result in invalid values \n");
+   }
 
     double dx = body2.position[0] - body1.position[0];
     double dy = body2.position[1] - body1.position[1];
@@ -70,7 +74,7 @@ __global__ void calculate_force ( int N, body_t *n_bodies, double (*forces) [3])
     double F_y = F_mag * (dy / distance);
     double F_z = F_mag * (dz / distance);
 
-    printf("body %lu\n", index1);
+    //printf("body %lu\n", index1);
     printf("F_x: %lf, F_y: %lf, F_z: %lf\n", F_x, F_y, F_z);
 
     forces[index1 * N + index2][0] = F_x;
@@ -136,6 +140,7 @@ __global__  void update_body ( double time_step, body_t *n_bodies, double (*forc
 void print_object(int index, body_t *n_bodies, double (*forces) [3]){
 
     printf("Body %d\n", index);
+    printf("Mass: %lf \n", n_bodies[index].mass);
     printf("Position:\n");
     for (int i = 0; i < 3; i++)
     {
@@ -157,7 +162,7 @@ void print_object(int index, body_t *n_bodies, double (*forces) [3]){
 
 }
 
-void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_bodies){
+void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_bodies, int iter_num){
 
 //allocate memory & copy to gpu
     double(*gpu_force)[3];
@@ -183,12 +188,13 @@ void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_
 
 
   // calculate
-  calculate_force<<<1, dim3(N,N)>>>(N, n_bodies_gpu, gpu_force);
+for (int i = 0; i < iter_num; i++){
+    printf("iter: %d\n", i);
+    calculate_force<<<1, dim3(N, N)>>>(N, n_bodies_gpu, gpu_force);
 
-
-  if (cudaDeviceSynchronize() != cudaSuccess)
-  {
-      fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(cudaPeekAtLastError()));
+    if (cudaDeviceSynchronize() != cudaSuccess)
+    {
+        fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(cudaPeekAtLastError()));
   }
 
     net_force<<<1,N>>>(N, n_bodies_gpu, gpu_force);
@@ -202,7 +208,9 @@ void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_
     fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(cudaPeekAtLastError()));
   }
 
+  
 
+}
 
 //copy back to CPU
 
@@ -238,17 +246,23 @@ cudaFree(n_bodies_gpu);
 
 int main(int argc, char** argv){
     
-    if (argc != 4) {
+    if (argc != 5) {
 
-    fprintf(stderr, "Usage: %s <input file name> <timestep> <duration>\n", argv[0]);
+    fprintf(stderr, "Usage: %s <input file name> <N> <timestep> <duration>\n", argv[0]);
 
     exit(1);
 
   }
 
-  // Try to open the input file
+// Get the total number of objects, namely N
+int N = atoi(argv[2]);
+//printf("N: %d\n", N);
 
-  FILE* input = fopen(argv[1], "r");
+// Get bodies from the csv file and store it into the n_bodies array
+
+
+  // Try to open the input file
+ FILE* input = fopen(argv[1], "r");
 
   if (input == NULL) {
 
@@ -260,53 +274,94 @@ int main(int argc, char** argv){
 
   }
 
+// Read row by row and create body object
  body_t *n_bodies = (body_t *)malloc(sizeof(body_t) * N);
 
   char* line = NULL;
 
   size_t line_capacity = 0;
 
+size_t counter = 0;
+size_t line_num = 0;
+
   while (getline(&line, &line_capacity, input) > 0) {
     body_t body = {.mass = 0, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
 
     char *token = strtok(line, ",");
-
-    int counter = 0;
+   
+    
     while (token != NULL)
     {
+        
      switch(counter){
         case 0:
-            body.mass = 
+            body.mass = strtod(token, NULL);
+            break;
         case 1:
+            body.position[0] = strtod(token, NULL);
+            break;
         case 2:
+            body.position[1] = strtod(token, NULL);
+            break;
         case 3:
+            body.position[2] = strtod(token, NULL);
+            break;
         case 4:
+            body.velocity[0] = strtod(token, NULL);
+            break;
         case 5:
+            body.velocity[1] = strtod(token, NULL);
+            break;
         case 6:
-        case 7:
-     }
+            body.velocity[2] = strtod(token, NULL);
+            break;
+
+     }//switch counter
+       
+      
         token = strtok(NULL, ",");
-    }
+        counter++;
+    }//while token
+    counter = 0; //reset counter
 
-    return 0;
+    //add that body to the array at line_num position
+    n_bodies[line_num] = body;
+    line_num++;
 
+}//while get line
+
+// Make sure given N is equal to the number of rows in the file.
+if(line_num!= N){
+     fprintf(stderr, "The number of objects given as N is not equal to the number of rows in the file.\n");
+     return 1;
 }
 
+    // get the time step 
+    double time_step = strtod(argv[3], NULL);
 
+   
 
-    int N = 2;
+    // get the duration i.e. how long we will simualte
+
+    double duration = strtod(argv[4], NULL);
+
+    // int N = 2;
     
    
-    double (*forces) [3] = (double(*)[3])malloc(N * N* sizeof(double[3]));
-    body_t body1 = {.mass = 500, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
-    body_t body2 = {.mass = 100, .position = {4, 3, 0}, .velocity = { 0, 0, 0 }};
+     double (*forces) [3] = (double(*)[3])malloc(N * N* sizeof(double[3]));
+    // body_t body1 = {.mass = 500, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
+    // body_t body2 = {.mass = 100, .position = {4, 3, 0}, .velocity = { 0, 0, 0 }};
 
-    n_bodies[0] = body1;
-    n_bodies[1] = body2;
+    // n_bodies[0] = body1;
+    // n_bodies[1] = body2;
 
-    double time_step = 0.01;
+    int iter_num = ceil(duration / time_step);
 
-    simulate_n_body(time_step, N, forces, n_bodies);
+  
+    simulate_n_body(time_step, N, forces, n_bodies, iter_num);
+  
+
+       
 
     // calculate_force<<<N, N>>>(N);
     // calculate_force(0, 0, N);
@@ -314,21 +369,24 @@ int main(int argc, char** argv){
 
     // calculate_force(0, 1, N);
     // calculate_force(1, 0, N);
-   
 
-  
 
-   
+
     // net_force(0, N);
     // net_force(1, N);
   //printf("==========afer net force ===================\n");
-   print_object(0 ,n_bodies, forces);
-  print_object(1 ,n_bodies, forces);
 
-    //printf("==========afer update ===================\n");
+     for (int i = 0; i < N; i++){
+        print_object(i, n_bodies, forces);
 
-   // update_body<<<1, N>>>(time_step);
-    //print_object(0);
+     }
+        
+     // print_object(1 ,n_bodies, forces);
 
-    return 0;
+     // printf("==========afer update ===================\n");
+
+     // update_body<<<1, N>>>(time_step);
+     // print_object(0);
+
+     return 0;
 }

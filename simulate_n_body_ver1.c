@@ -147,48 +147,79 @@ void print_object(int index){
 
 
 int main(int argc, char** argv){
-    int N = 2;
+    int N = 4;
     n_bodies = (body_t *)malloc(sizeof(body_t) * N);
     forces = (double(*)[3])malloc(N * N* sizeof(double[3]));
     body_t body1 = {.mass = 500, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
     body_t body2 = {.mass = 100, .position = {4, 3, 0}, .velocity = { 0, 0, 0 }};
+    body_t body3 = {.mass = 100, .position = {3, 3, 3}, .velocity = { 0, 0, 0 }};
+    body_t body4 = {.mass = 300, .position = {1, 0, 0}, .velocity = { 0, 0, 0 }};
 
     n_bodies[0] = body1;
     n_bodies[1] = body2;
+    n_bodies[2] = body3;
+    n_bodies[3] = body4;
 
-    double time_step = 0.01;
+    double time_step = 0.1;
 
-    calculate_force(0, 0, N);
-    calculate_force(1, 1, N);
+    for (int i = 0; i < 10; i++){
+        printf("Iter: %d \n", i);
+        calculate_force(0, 0, N);
+        calculate_force(1, 1, N);
+        calculate_force(2, 2, N);
+        calculate_force(3, 3, N);
 
-    calculate_force(0, 1, N);
-    calculate_force(1, 0, N);
-   
+        calculate_force(0, 1, N);
+        calculate_force(1, 0, N);
 
-    // for (int i = 0; i < N * N; i++){
-    //     printf("%d\n", i);
-    //     for (int j = 0; j < 3; j++)
-    //     {
+        calculate_force(0, 2, N);
+        calculate_force(2, 0, N);
 
-    //         printf("%lf", i, forces[i][j]);
-    //     }
-    //     printf("\n");
-    // }
+        calculate_force(1, 2, N);
+        calculate_force(2, 1, N);
 
-    printf("\n");
+        calculate_force(0, 3, N);
+        calculate_force(3, 0, N);
 
-    net_force(0, N);
-    net_force(1, N);
-    printf("==========afer net force ===================\n");
-    print_object(0);
-    print_object(1);
+        calculate_force(1, 3, N);
+        calculate_force(3, 1, N);
+
+        calculate_force(2, 3, N);
+        calculate_force(3, 2, N);
+        // for (int i = 0; i < N * N; i++){
+        //     printf("%d\n", i);
+        //     for (int j = 0; j < 3; j++)
+        //     {
+
+        //         printf("%lf", i, forces[i][j]);
+        //     }
+        //     printf("\n");
+        // }
+
+        printf("\n");
+
+        net_force(0, N);
+        net_force(1, N);
+        net_force(2, N);
+        net_force(3, N);
+
+        update_body(0, time_step);
+        update_body(1, time_step);
+        update_body(2, time_step);
+        update_body(3, time_step);
+
+    }
+    // printf("==========afer net force ===================\n");
+    // print_object(0);
+    // print_object(1);
 
     printf("==========afer update ===================\n");
 
-    update_body(0, time_step);
-    update_body(1, time_step);
+   
     print_object(0);
     print_object(1);
+    print_object(2);
+    print_object(3);
 
     return 0;
 }
