@@ -107,7 +107,8 @@ __global__ void net_force (int N, body_t *n_bodies, double (*forces) [3]){
  * Update funciton (euler's method)
  */
 
-__global__  void update_body ( double time_step, body_t *n_bodies, double (*forces) [3]){
+__global__  void update_body (double time_step, body_t *n_bodies, double (*forces) [3], 
+body_t* body_per_time, int current_iter, int N){
     size_t index = threadIdx.x;
     body_t body = n_bodies[index];
 
@@ -135,11 +136,12 @@ __global__  void update_body ( double time_step, body_t *n_bodies, double (*forc
     n_bodies[index].position[1] = body.position[1] +  n_bodies[index].velocity[1] * time_step;
     n_bodies[index].position[2] = body.position[2] +  n_bodies[index].velocity[2] * time_step;
 
+   body_per_time[current_iter*N + index] = n_bodies[index];
 }
 
-void print_object(int index, body_t *n_bodies, double (*forces) [3]){
+void print_object(int index, body_t *n_bodies, double (*forces) [3], int N){
 
-    printf("Body %d\n", index);
+    printf("Body %d\n", index %N );
     printf("Mass: %lf \n", n_bodies[index].mass);
     printf("Position:\n");
     for (int i = 0; i < 3; i++)
@@ -187,13 +189,18 @@ __global__  void print_object_gpu(int index, body_t *n_bodies, double (*forces) 
 }
 
 
-void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_bodies, int iter_num){
+void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_bodies, int iter_num,  body_t *body_per_time_cpu){
 
 //allocate memory & copy to gpu
     double(*gpu_force)[3];
     body_t *n_bodies_gpu;
+    body_t *body_per_time_gpu;
+    // body_t body_per_time[iter_num][N];
 
     if (cudaMalloc(&gpu_force, N * N* sizeof(double[3])) != cudaSuccess){
+        fprintf(stderr, "Failed to allocate memory for the force");
+    }
+    if (cudaMalloc(&body_per_time_gpu, iter_num * sizeof(body_t) * N) != cudaSuccess){
         fprintf(stderr, "Failed to allocate memory for the force");
     }
 
@@ -206,6 +213,14 @@ void simulate_n_body (double time_step, int N,  double (*forces) [3], body_t *n_
     if(cudaMemcpy(gpu_force, forces,  N * N* sizeof(double[3]), cudaMemcpyHostToDevice) != cudaSuccess) {
     fprintf(stderr, "Failed to copy force to the GPU\n");
   }
+
+ if(cudaMemcpy(body_per_time_gpu, body_per_time_cpu,  iter_num * sizeof(body_t) * N, cudaMemcpyHostToDevice) != cudaSuccess) {
+    fprintf(stderr, "Failed to copy force to the GPU\n");
+  }
+
+//   if(cudaMemset(body_per_time_gpu, 0, iter_num * sizeof(body_t) * N) != cudaSuccess) {
+//     fprintf(stderr, "Failed to copy n bodies to the GPU\n");
+//   } 
 
    if(cudaMemcpy(n_bodies_gpu, n_bodies, sizeof(body_t) * N, cudaMemcpyHostToDevice) != cudaSuccess) {
     fprintf(stderr, "Failed to copy n bodies to the GPU\n");
@@ -228,15 +243,17 @@ for (int i = 0; i < iter_num; i++){
   }
 
 
-    update_body<<<1, N>>>(time_step, n_bodies_gpu, gpu_force);
+    update_body<<<1, N>>>(time_step, n_bodies_gpu, gpu_force, body_per_time_gpu, i, N);
      if(cudaDeviceSynchronize() != cudaSuccess) {
     fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(cudaPeekAtLastError()));
   }
 
-    for (int i = 0; i < N; i++){
-        print_object_gpu<<<1,N>>>(i, n_bodies_gpu, gpu_force);
+  //cudaMallocManaged()
 
-     }
+    // for (int i = 0; i < N; i++){
+    //     print_object_gpu<<<1,N>>>(i, n_bodies_gpu, gpu_force);
+
+    //  }
         
 
 }
@@ -249,6 +266,10 @@ for (int i = 0; i < iter_num; i++){
 
  if(cudaMemcpy(n_bodies, n_bodies_gpu, sizeof(body_t) * N, cudaMemcpyDeviceToHost) != cudaSuccess) {
     fprintf(stderr, "Failed to copy n bodies from the GPU\n");
+  }
+
+    if(cudaMemcpy(body_per_time_cpu, body_per_time_gpu,  iter_num * sizeof(body_t) * N, cudaMemcpyDeviceToHost) != cudaSuccess) {
+        fprintf(stderr, "Failed to copy forces from the GPU\n");
   }
 
 
@@ -266,7 +287,7 @@ for (int i = 0; i < iter_num; i++){
   
   cudaFree(gpu_force);
 cudaFree(n_bodies_gpu);
-
+cudaFree(body_per_time_gpu);
 
 }
 
@@ -386,8 +407,17 @@ if(line_num!= N){
 
     int iter_num = ceil(duration / time_step);
 
-  
-    simulate_n_body(time_step, N, forces, n_bodies, iter_num);
+    body_t *body_per_time_cpu = (body_t *)malloc(iter_num * sizeof(body_t) * N);
+
+    printf("========================Initial Configurations=========================\n");
+
+    for (int i = 0; i < N; i++)
+        {
+            print_object(i, n_bodies, forces, N);
+        }
+    
+
+    simulate_n_body(time_step, N, forces, n_bodies, iter_num, body_per_time_cpu);
   
 
        
@@ -405,11 +435,16 @@ if(line_num!= N){
     // net_force(1, N);
   //printf("==========afer net force ===================\n");
 
-     for (int i = 0; i < N; i++){
-        print_object(i, n_bodies, forces);
 
-     }
-        
+
+    for (int j = 0; j < iter_num; j++)
+    {
+        printf("======================Time: %d=================================\n", j+1);
+        for (int i = 0; i < N; i++)
+        {
+            print_object(j* N + i, body_per_time_cpu, forces, N);
+        }
+    }
      // print_object(1 ,n_bodies, forces);
 
      // printf("==========afer update ===================\n");
