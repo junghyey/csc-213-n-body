@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define G 10
+# define G 66743 // km^3/(Tg^2 * s^2)
 
 // (6.67430 * (pow (10, -11)))
 /**
@@ -273,19 +273,9 @@ for (int i = 0; i < iter_num; i++){
   }
 
 
-    // for (int i = 0; i < N * N; i++){
-    //     printf("%d\n", i);
-    //     for (int j = 0; j < 3; j++)
-    //     {
-
-    //         printf("%lf", i, forces[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
   
   
-  cudaFree(gpu_force);
+cudaFree(gpu_force);
 cudaFree(n_bodies_gpu);
 cudaFree(body_per_time_gpu);
 
@@ -336,7 +326,7 @@ size_t line_num = 0;
 
   while (getline(&line, &line_capacity, input) > 0) {
     body_t body = {.mass = 0, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
-
+    
     char *token = strtok(line, ",");
    
     
@@ -345,7 +335,7 @@ size_t line_num = 0;
         
      switch(counter){
         case 0:
-            body.mass = strtod(token, NULL);
+            body.mass = strtod(token, NULL) * pow(10,12);
             break;
         case 1:
             body.position[0] = strtod(token, NULL);
@@ -395,15 +385,8 @@ if(line_num!= N){
 
     double duration = strtod(argv[4], NULL);
 
-    // int N = 2;
-    
-   
      double (*forces) [3] = (double(*)[3])malloc(N * N* sizeof(double[3]));
-    // body_t body1 = {.mass = 500, .position = {0, 0, 0}, .velocity = { 0, 0, 0 }};
-    // body_t body2 = {.mass = 100, .position = {4, 3, 0}, .velocity = { 0, 0, 0 }};
-
-    // n_bodies[0] = body1;
-    // n_bodies[1] = body2;
+   
 
     int iter_num = ceil(duration / time_step);
 
@@ -420,37 +403,77 @@ if(line_num!= N){
     simulate_n_body(time_step, N, forces, n_bodies, iter_num, body_per_time_cpu);
   
 
-       
+    // for (int j = 0; j < iter_num; j++)
+    // {
+    //     printf("======================Time: %d=================================\n", j+1);
+    //     for (int i = 0; i < N; i++)
+    //     {
+    //         print_object(j* N + i, body_per_time_cpu, forces, N);
+    //     }
+    // }
 
-    // calculate_force<<<N, N>>>(N);
-    // calculate_force(0, 0, N);
-    // calculate_force(1, 1, N);
-
-    // calculate_force(0, 1, N);
-    // calculate_force(1, 0, N);
-
-
-
-    // net_force(0, N);
-    // net_force(1, N);
-  //printf("==========afer net force ===================\n");
-
+    FILE* output_file = fopen("./output.csv", "w");
+ 
+    if (!output_file)
+        printf("Can't open file\n");
 
 
-    for (int j = 0; j < iter_num; j++)
-    {
-        printf("======================Time: %d=================================\n", j+1);
-        for (int i = 0; i < N; i++)
-        {
-            print_object(j* N + i, body_per_time_cpu, forces, N);
-        }
-    }
-     // print_object(1 ,n_bodies, forces);
+    else {
+        fprintf(output_file,"Body, Px, Py, Pz, Vx, Vy, Vz, Time\n");
 
-     // printf("==========afer update ===================\n");
+        for (int j = 0; j < iter_num; j++){
+            for (int i = 0; i < N; i++){
+                int index = j * N + i;
+                fprintf(output_file, "%d,", index % N);
 
-     // update_body<<<1, N>>>(time_step);
-     // print_object(0);
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].position[0]);
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].position[1]);
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].position[2]);
+
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[0]);
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[1]);
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[2]);
+
+                fprintf(output_file, "%lf,", j * time_step);
+
+                fprintf(output_file ,"\n");
+            }// for i
+        }// for j
+
+    //     printf("Body %d\n", index %N );
+    // printf("Mass: %lf \n", n_bodies[index].mass);
+    // printf("Position:\n");
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     printf("%lf, ", n_bodies[index].position[i]);
+    // }
+    // printf("\n");
+    // printf("Velocity:\n");
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     printf("%lf, ", n_bodies[index].velocity[i]);
+    // }
+    // printf("\n");
+    // printf("Net Force:\n");
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     printf("%lf, ", n_bodies[index].net_force[i]);
+    // }
+    // printf("\n");
+
+
+    }//else
+
+        // Close the file
+        fclose(output_file);
+    
+ 
+
+
+    
+    // store the result in csv file
+
+
 
      return 0;
 }
