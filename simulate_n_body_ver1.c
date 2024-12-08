@@ -208,18 +208,26 @@ int main(int argc, char** argv){
         update_body(2, time_step);
         update_body(3, time_step);
 
-    }
-    // printf("==========afer net force ===================\n");
-    // print_object(0);
-    // print_object(1);
-
-    printf("==========afer update ===================\n");
+          printf("======================Time: %d=================================\n", i);
 
    
     print_object(0);
     print_object(1);
     print_object(2);
     print_object(3);
+
+    }
+    // printf("==========afer net force ===================\n");
+    // print_object(0);
+    // print_object(1);
+
+    // printf("==========afer update ===================\n");
+
+   
+    // print_object(0);
+    // print_object(1);
+    // print_object(2);
+    // print_object(3);
 
     return 0;
 }

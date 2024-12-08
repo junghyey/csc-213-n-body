@@ -419,7 +419,7 @@ if(line_num!= N){
 
 
     else {
-        fprintf(output_file,"Body, Px, Py, Pz, Vx, Vy, Vz, Time\n");
+        fprintf(output_file,"Body,Px,Py,Pz,Vx,Vy,Vz,Time\n");
 
         for (int j = 0; j < iter_num; j++){
             for (int i = 0; i < N; i++){
@@ -434,7 +434,7 @@ if(line_num!= N){
                 fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[1]);
                 fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[2]);
 
-                fprintf(output_file, "%lf,", j * time_step);
+                fprintf(output_file, "%lf", j * time_step);
 
                 fprintf(output_file ,"\n");
             }// for i
