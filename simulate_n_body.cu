@@ -335,7 +335,7 @@ size_t line_num = 0;
         
      switch(counter){
         case 0:
-            body.mass = strtod(token, NULL) * pow(10,12);
+            body.mass = strtod(token, NULL) ;
             break;
         case 1:
             body.position[0] = strtod(token, NULL);
@@ -393,10 +393,28 @@ if(line_num!= N){
     body_t *body_per_time_cpu = (body_t *)malloc(iter_num * sizeof(body_t) * N);
 
     printf("========================Initial Configurations=========================\n");
+    FILE* output_file = fopen("./output.csv", "w");
+ 
+    if (!output_file)
+        printf("Can't open file\n");
 
+  fprintf(output_file,"Body,Mass,Px,Py,Pz,Vx,Vy,Vz,Time\n");
     for (int i = 0; i < N; i++)
         {
-            print_object(i, n_bodies, forces, N);
+              fprintf(output_file, "%d,", i);
+                fprintf(output_file, "%lf,", n_bodies[i].mass);
+
+                fprintf(output_file, "%lf,", n_bodies[i].position[0]);
+                fprintf(output_file, "%lf,", n_bodies[i].position[1]);
+                fprintf(output_file, "%lf,", n_bodies[i].position[2]);
+
+                fprintf(output_file, "%lf,", n_bodies[i].velocity[0]);
+                fprintf(output_file, "%lf,", n_bodies[i].velocity[1]);
+                fprintf(output_file, "%lf,", n_bodies[i].velocity[2]);
+
+                fprintf(output_file, "0.0");
+
+                fprintf(output_file ,"\n");
         }
     
 
@@ -412,14 +430,10 @@ if(line_num!= N){
     //     }
     // }
 
-    FILE* output_file = fopen("./output.csv", "w");
  
-    if (!output_file)
-        printf("Can't open file\n");
 
-
-    else {
-        fprintf(output_file,"Body,Mass,Px,Py,Pz,Vx,Vy,Vz,Time\n");
+ 
+      
 
         for (int j = 0; j < iter_num; j++){
             for (int i = 0; i < N; i++){
@@ -437,7 +451,7 @@ if(line_num!= N){
                 fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[1]);
                 fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[2]);
 
-                fprintf(output_file, "%lf", j * time_step);
+                fprintf(output_file, "%lf", (j+1) * time_step);
 
                 fprintf(output_file ,"\n");
             }// for i
@@ -465,10 +479,10 @@ if(line_num!= N){
     // printf("\n");
 
 
-    }//else
+    
 
         // Close the file
-        fclose(output_file);
+    fclose(output_file);
     
  
 
