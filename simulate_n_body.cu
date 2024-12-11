@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-# define G 66743 // km^3/(Tg^2 * s^2)
+# define G 0.1 // km^3/(Tg^2 * s^2)
 
 // (6.67430 * (pow (10, -11)))
 /**
@@ -419,12 +419,15 @@ if(line_num!= N){
 
 
     else {
-        fprintf(output_file,"Body,Px,Py,Pz,Vx,Vy,Vz,Time\n");
+        fprintf(output_file,"Body,Mass,Px,Py,Pz,Vx,Vy,Vz,Time\n");
 
         for (int j = 0; j < iter_num; j++){
             for (int i = 0; i < N; i++){
                 int index = j * N + i;
+
+                
                 fprintf(output_file, "%d,", index % N);
+                fprintf(output_file, "%lf,", body_per_time_cpu[index].mass);
 
                 fprintf(output_file, "%lf,", body_per_time_cpu[index].position[0]);
                 fprintf(output_file, "%lf,", body_per_time_cpu[index].position[1]);

@@ -4,6 +4,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.animation import PillowWriter
 import pandas as pd
 from matplotlib import cm
+import math
 
 
 
@@ -32,7 +33,7 @@ def main():
     ax.set_zlabel("Z-coordinate")
 
     def update(frame):
-       # ax.clear()
+        ax.clear()
         snapshot = output_groupped.get_group(time_values[frame])
         ax.set_xlim(output['Px'].min(), output['Px'].max())
         ax.set_ylim(output['Py'].min(), output['Py'].max())
@@ -43,7 +44,7 @@ def main():
 
         for body in unique_bodies:
             body_data = snapshot[snapshot["Body"] == body]
-            ax.scatter(body_data["Px"], body_data["Py"], body_data["Pz"], c =body_colors[body], marker = "o")
+            ax.scatter(body_data["Px"], body_data["Py"], body_data["Pz"], c =body_colors[body], s = math.log(body_data["Mass"]), marker = "o")
 
         
         # current_time = frame
@@ -53,8 +54,10 @@ def main():
         #     plots[group_name].set_data(current_data["Px"], current_data["Py"])
         #     plots[group_name].set_3d_properties(current_data["Pz"])
         # return plots.values()
-    handles = [plt.Line2D ([], [], color = body_colors[body], marker = "o", label = f"Body {body}") for body in unique_bodies]
-    ax.legend(handles = handles, loc = "upper left")
+
+        handles = [plt.Line2D ([], [], color = body_colors[body], marker = "o", label = f"Body {body}") for body in unique_bodies]
+        ax.legend(handles = handles, loc = "upper left")
+
     ani = FuncAnimation(fig, update, frames = len(time_values), interval =10)
     
     plt.show()
