@@ -41,6 +41,7 @@ def main():
         snapshot = output_groupped.get_group(time_values[frame])
 
         # Reset axis limits and labels
+        ax.set_title(f"Time: {time_values[frame]:.1f}s")
         ax.set_xlim(output['Px'].min(), output['Px'].max())
         ax.set_ylim(output['Py'].min(), output['Py'].max())
         ax.set_zlim(output['Pz'].min(), output['Pz'].max())
@@ -67,16 +68,16 @@ def main():
                     loc = "center left", 
                     bbox_to_anchor = (1.1, 0.5), 
                     title= "Bodies", 
-                    ncol = 3)
+                    ncol = 2)
 
     # Create an animation using the update function
-    ani = FuncAnimation(fig, update, frames = len(time_values), interval =10)
+    ani = FuncAnimation(fig, update, frames = len(time_values), interval =50)
 
-    # Save the animation as a GIF
-    ani.save("visualization.gif", writer=PillowWriter(fps=30))
-    
     # Show the animation
     plt.show()
 
+    # Save the animation as a GIF
+    #ani.save("visualization.gif", writer=PillowWriter(fps=30))
+    
 if __name__ == "__main__":
     main()

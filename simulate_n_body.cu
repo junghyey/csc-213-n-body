@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-# define G 0.1 // km^3/(Tg^2 * s^2)
-
-// (6.67430 * (pow (10, -11)))
+# define G 0.1
 
 /**
  * Simulate n body problem
@@ -56,9 +54,6 @@ __global__ void calculate_force(int N, body_t *n_bodies, double (*forces)[3]) {
   double F_x = F_mag * (dx / distance);
   double F_y = F_mag * (dy / distance);
   double F_z = F_mag * (dz / distance);
-
-  // printf("body %lu\n", index1);
-  // printf("F_x: %lf, F_y: %lf, F_z: %lf\n", F_x, F_y, F_z);
 
   forces[index1 * N + index2][0] = F_x;
   forces[index1 * N + index2][1] = F_y;
@@ -112,11 +107,13 @@ __global__ void update_body(double time_step, body_t *n_bodies, double (*forces)
   n_bodies[index].position[0] = body.position[0] + v_X * time_step;
   n_bodies[index].position[1] = body.position[1] + v_Y * time_step;
   n_bodies[index].position[2] = body.position[2] + v_Z * time_step;
-
+  
   // velocity
   n_bodies[index].velocity[0] = v_X + a_X * time_step;
   n_bodies[index].velocity[1] = v_Y + a_Y * time_step;
   n_bodies[index].velocity[2] = v_Z + a_Z * time_step;
+
+  
 
   body_per_time[current_iter * N + index] = n_bodies[index];
 }
@@ -370,47 +367,11 @@ int main(int argc, char **argv) {
 
       fprintf(output_file, "%lf", (j + 1) * time_step);
 
-    simulate_n_body(time_step, N, forces, n_bodies, iter_num, body_per_time_cpu);
-  
-      
+      fprintf(output_file, "\n");
+    } // for i
+  } // for j
 
-        for (int j = 0; j < iter_num; j++){
-            for (int i = 0; i < N; i++){
-                int index = j * N + i;
-
-                
-                fprintf(output_file, "%d,", index % N);
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].mass);
-
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].position[0]);
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].position[1]);
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].position[2]);
-
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[0]);
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[1]);
-                fprintf(output_file, "%lf,", body_per_time_cpu[index].velocity[2]);
-
-                fprintf(output_file, "%lf", (j+1) * time_step);
-
-                fprintf(output_file ,"\n");
-            }// for i
-        }// for j
-
-    
-    
-
-        // Close the file
-    fclose(output_file);
-    
- 
-
-
-    
-    // store the result in csv file
-
-
-
-     return 0;
-}
-  }
+  // Close the file
+  fclose(output_file);
+  return 0;
 }
