@@ -107,16 +107,16 @@ __global__ void update_body(double time_step, body_t *n_bodies, double (*forces)
   double a_Y = f_Y / mass;
   double a_Z = f_Z / mass;
 
+  // position
+
+  n_bodies[index].position[0] = body.position[0] + v_X * time_step;
+  n_bodies[index].position[1] = body.position[1] + v_Y * time_step;
+  n_bodies[index].position[2] = body.position[2] + v_Z * time_step;
+
   // velocity
   n_bodies[index].velocity[0] = v_X + a_X * time_step;
   n_bodies[index].velocity[1] = v_Y + a_Y * time_step;
   n_bodies[index].velocity[2] = v_Z + a_Z * time_step;
-
-  // position
-
-  n_bodies[index].position[0] = body.position[0] + n_bodies[index].velocity[0] * time_step;
-  n_bodies[index].position[1] = body.position[1] + n_bodies[index].velocity[1] * time_step;
-  n_bodies[index].position[2] = body.position[2] + n_bodies[index].velocity[2] * time_step;
 
   body_per_time[current_iter * N + index] = n_bodies[index];
 }
@@ -370,7 +370,6 @@ int main(int argc, char **argv) {
 
       fprintf(output_file, "%lf", (j + 1) * time_step);
 
-<<<<<<< HEAD
     simulate_n_body(time_step, N, forces, n_bodies, iter_num, body_per_time_cpu);
   
       
@@ -397,28 +396,7 @@ int main(int argc, char **argv) {
             }// for i
         }// for j
 
-    //     printf("Body %d\n", index %N );
-    // printf("Mass: %lf \n", n_bodies[index].mass);
-    // printf("Position:\n");
-    // for (int i = 0; i < 3; i++)
-    // {
-    //     printf("%lf, ", n_bodies[index].position[i]);
-    // }
-    // printf("\n");
-    // printf("Velocity:\n");
-    // for (int i = 0; i < 3; i++)
-    // {
-    //     printf("%lf, ", n_bodies[index].velocity[i]);
-    // }
-    // printf("\n");
-    // printf("Net Force:\n");
-    // for (int i = 0; i < 3; i++)
-    // {
-    //     printf("%lf, ", n_bodies[index].net_force[i]);
-    // }
-    // printf("\n");
-
-
+    
     
 
         // Close the file
@@ -433,13 +411,6 @@ int main(int argc, char **argv) {
 
 
      return 0;
-=======
-      fprintf(output_file, "\n");
-    } // for i
-  } // for j
-
-  // Close the file
-  fclose(output_file);
-  return 0;
->>>>>>> cd526967291af4b4f11c3e485ec76faf987f9e5e
+}
+  }
 }
