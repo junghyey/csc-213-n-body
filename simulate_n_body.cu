@@ -420,19 +420,6 @@ if(line_num!= N){
 
     simulate_n_body(time_step, N, forces, n_bodies, iter_num, body_per_time_cpu);
   
-
-    // for (int j = 0; j < iter_num; j++)
-    // {
-    //     printf("======================Time: %d=================================\n", j+1);
-    //     for (int i = 0; i < N; i++)
-    //     {
-    //         print_object(j* N + i, body_per_time_cpu, forces, N);
-    //     }
-    // }
-
- 
-
- 
       
 
         for (int j = 0; j < iter_num; j++){
