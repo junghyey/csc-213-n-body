@@ -77,7 +77,7 @@ def main():
     plt.show()
 
     # Save the animation as a GIF
-    #ani.save("visualization.gif", writer=PillowWriter(fps=30))
+    ani.save("visualization_real.gif", writer=PillowWriter(fps=30))
     
 if __name__ == "__main__":
     main()

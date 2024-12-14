@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-# define G 0.1
+# define G 10
 
 /**
  * Simulate n body problem
