@@ -1,5 +1,4 @@
 {
-    "files.associations": {
-        "cmath": "cpp"
-    }
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, BreakBeforeBraces: Attach }",
+    "editor.formatOnSave": true
 }
