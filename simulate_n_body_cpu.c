@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /**
  * Customized gravitational constant, G, used for force calculations
@@ -9,21 +9,19 @@
  **/
 #define G 10
 
-
 /**
  * The structure to store the information for each individual body
  */
 typedef struct body {
-  double position[3];  // Position in 3D space: [x, y, z]
-  double mass;         // Mass of the body
-  double velocity[3];  // Velocity in 3D space: [vx, vy, vz]
-  double net_force[3]; // Net force acting on the body in 3D: [Fx, Fy, Fz]
+  double position[3];   // Position in 3D space: [x, y, z]
+  double mass;          // Mass of the body
+  double velocity[3];   // Velocity in 3D space: [vx, vy, vz]
+  double net_force[3];  // Net force acting on the body in 3D: [Fx, Fy, Fz]
 } body_t;
 
-body_t *n_bodies; // Array of n bodies in the simulation
+body_t *n_bodies;  // Array of n bodies in the simulation
 
-double (*forces)[3]; // 2D array to store forces between each pair of bodies
-
+double (*forces)[3];  // 2D array to store forces between each pair of bodies
 
 /**
  * Calculate the gravitational force applied on one body by another.
@@ -67,10 +65,9 @@ void calculate_force(int index1, int index2, int N) {
   forces[index1 * N + index2][2] = F_z;
 }
 
-
 /**
  * Calculate the net force acting on a body from all other bodies.
- * 
+ *
  * @param index Index of the body to calculate the net force for.
  * @param N     Total number of bodies in the simulation.
  */
@@ -79,7 +76,7 @@ void net_force(int index, int N) {
   double F_x = 0.0;
   double F_y = 0.0;
   double F_z = 0.0;
-  
+
   // Calculate the sum of forces exerted on the body
   for (int i = start_index; i < start_index + N; i++) {
     F_x += forces[i][0];
@@ -95,7 +92,7 @@ void net_force(int index, int N) {
 
 /**
  * Update the position and velocity of a body using Euler's method.
- * 
+ *
  * @param index     Index of the body to update.
  * @param time_step The timestep for the simulation.
  */
@@ -124,15 +121,17 @@ void update_body(int index, double time_step) {
   n_bodies[index].velocity[2] = v_z + a_z * time_step;
 
   // Update position components
-  n_bodies[index].position[0] = body.position[0] + n_bodies[index].velocity[0] * time_step;
-  n_bodies[index].position[1] = body.position[1] + n_bodies[index].velocity[1] * time_step;
-  n_bodies[index].position[2] = body.position[2] + n_bodies[index].velocity[2] * time_step;
+  n_bodies[index].position[0] =
+      body.position[0] + n_bodies[index].velocity[0] * time_step;
+  n_bodies[index].position[1] =
+      body.position[1] + n_bodies[index].velocity[1] * time_step;
+  n_bodies[index].position[2] =
+      body.position[2] + n_bodies[index].velocity[2] * time_step;
 }
-
 
 /**
  * Print the details of a body, including its position, velocity, and net force.
- * 
+ *
  * @param index Index of the body to print.
  */
 void print_object(int index) {
@@ -157,13 +156,13 @@ void print_object(int index) {
   printf("\n\n");
 }
 
-
 /**
- * Main function to initialize the simulation, run iterations, and display results.
+ * Main function to initialize the simulation, run iterations, and display
+ * results.
  */
 int main(int argc, char **argv) {
-  int N = 4; // Number of bodies
-  double time_step = 0.1; // Simulation timestep
+  int N = 4;               // Number of bodies
+  double time_step = 0.1;  // Simulation timestep
 
   // Allocate memory for bodies and force matrix
   n_bodies = (body_t *)malloc(sizeof(body_t) * N);
@@ -179,7 +178,7 @@ int main(int argc, char **argv) {
   n_bodies[1] = body2;
   n_bodies[2] = body3;
   n_bodies[3] = body4;
-  
+
   // Simulation loop
   for (int i = 0; i < 10; i++) {
     // Calculate pairwise forces
@@ -212,7 +211,8 @@ int main(int argc, char **argv) {
     update_body(2, time_step);
     update_body(3, time_step);
 
-    printf("====================== Time: %lf second ======================\n", (i+1) * time_step);
+    printf("====================== Time: %lf second ======================\n",
+           (i + 1) * time_step);
 
     // Print object data
     print_object(0);

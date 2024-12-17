@@ -1,18 +1,18 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
 #include <curand_kernel.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 /**
  * The structure to store the information for each individual body
  */
 typedef struct body {
-  double position[3];  // Position in 3D space: [x, y, z]
-  double mass;         // Mass of the body
-  double velocity[3];  // Velocity in 3D space: [vx, vy, vz]
-  double net_force[3]; // Net force acting on the body in 3D: [Fx, Fy, Fz]
+  double position[3];   // Position in 3D space: [x, y, z]
+  double mass;          // Mass of the body
+  double velocity[3];   // Velocity in 3D space: [vx, vy, vz]
+  double net_force[3];  // Net force acting on the body in 3D: [Fx, Fy, Fz]
 } body_t;
 
 /**
@@ -23,32 +23,34 @@ typedef struct body {
  * @param seed Seed value for random number generation.
  * @param range_max Maximum range for position and velocity values.
  */
-__global__ void generate_body(int N, body_t *n_bodies, size_t seed, int range_max) {
+__global__ void generate_body(int N, body_t *n_bodies, size_t seed,
+                              int range_max) {
   size_t index = threadIdx.x;
   curandState state;
   curand_init(seed, index, 0, &state);
 
   // Store randome data to the body
-  body_t body = {.mass = 10 + ((range_max - 10 + 1)) * curand_uniform(&state),
-                 .position = {-range_max + (2 * range_max) * curand_uniform(&state),
-                              -range_max + (2 * range_max) * curand_uniform(&state),
-                              -range_max + (2 * range_max) * curand_uniform(&state)},
-                 .velocity = {-range_max + (2 * range_max) * curand_uniform(&state),
-                              -range_max + (2 * range_max) * curand_uniform(&state),
-                              -range_max + (2 * range_max) * curand_uniform(&state)}};
+  body_t body = {
+      .mass = 10 + ((range_max - 10 + 1)) * curand_uniform(&state),
+      .position = {-range_max + (2 * range_max) * curand_uniform(&state),
+                   -range_max + (2 * range_max) * curand_uniform(&state),
+                   -range_max + (2 * range_max) * curand_uniform(&state)},
+      .velocity = {-range_max + (2 * range_max) * curand_uniform(&state),
+                   -range_max + (2 * range_max) * curand_uniform(&state),
+                   -range_max + (2 * range_max) * curand_uniform(&state)}};
 
   n_bodies[index] = body;
 }
 
-
 /**
- * Generates an array of random bodies on the GPU and copies them to the host memory.
+ * Generates an array of random bodies on the GPU and copies them to the host
+ * memory.
  *
  * @param n_bodies Pointer to the array of bodies in host memory.
  * @param N The number of bodies to generate.
  */
 void generate_n_body(body_t *n_bodies, int N) {
-  body_t *n_bodies_gpu;   // Pointer to bodies array in GPU memory
+  body_t *n_bodies_gpu;  // Pointer to bodies array in GPU memory
 
   // Allocate GPU memory for the bodies
   if (cudaMalloc(&n_bodies_gpu, sizeof(body_t) * N) != cudaSuccess) {
@@ -56,20 +58,23 @@ void generate_n_body(body_t *n_bodies, int N) {
   }
 
   // Copy the initial state of bodies to GPU
-  if (cudaMemcpy(n_bodies_gpu, n_bodies, sizeof(body_t) * N, cudaMemcpyHostToDevice) != cudaSuccess) {
+  if (cudaMemcpy(n_bodies_gpu, n_bodies, sizeof(body_t) * N,
+                 cudaMemcpyHostToDevice) != cudaSuccess) {
     fprintf(stderr, "Failed to copy n bodies to the GPU\n");
   }
 
   // Launch the kernel function to generate random bodies
   generate_body<<<1, N>>>(N, n_bodies_gpu, time(NULL), 100000);
 
-  // Synchronize the device to ensure all threads have completed  
+  // Synchronize the device to ensure all threads have completed
   if (cudaDeviceSynchronize() != cudaSuccess) {
-    fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(cudaPeekAtLastError()));
+    fprintf(stderr, "CUDA Error: %s\n",
+            cudaGetErrorString(cudaPeekAtLastError()));
   }
 
   // Copy the generated bodies from GPU to CPU memory
-  if (cudaMemcpy(n_bodies, n_bodies_gpu, sizeof(body_t) * N, cudaMemcpyDeviceToHost) != cudaSuccess) {
+  if (cudaMemcpy(n_bodies, n_bodies_gpu, sizeof(body_t) * N,
+                 cudaMemcpyDeviceToHost) != cudaSuccess) {
     fprintf(stderr, "Failed to copy forces from the GPU\n");
   }
 
@@ -87,7 +92,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  int N = atoi(argv[1]);    // Number of bodies
+  int N = atoi(argv[1]);  // Number of bodies
 
   // Create the output file for storing random bodies
   FILE *output_file = fopen("./random_data.csv", "w");
@@ -114,7 +119,7 @@ int main(int argc, char **argv) {
 
   // Close the output file
   fclose(output_file);
-  
+
   // Free allocated memory
   free(n_bodies);
   return 0;
