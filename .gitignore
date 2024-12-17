@@ -1,4 +1,4 @@
 # Ignore all C executables
-*.exe
-*.out
-*.o
+simulate_n_body_cpu
+simulate_n_body
+generate_bodies
