@@ -126,4 +126,5 @@ python visualization.py
 4. CSC213 Lab codes
 
 5. Professor Charlie Curtsinger & Mentor Session
-  
+
+6. visualization.py code source : https://github.com/arpmay/N-body-Problem/blob/main/main.py
