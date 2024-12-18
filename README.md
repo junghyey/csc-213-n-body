@@ -122,4 +122,8 @@ python visualization.py
 2. Computation and astrophysics of the N-body problem. (n.d.). In Lecture 3 (p. 2). https://www.maths.ed.ac.uk/~heggie/lecture3.pdf
 
 3. Wikipedia contributors. (2024, November 21). N-body problem.https://en.wikipedia.org/wiki/N-body_problem
-   https://pngtree.com/free-png-vectors/python-snake-clipart (python image)
+
+4. CSC213 Lab codes
+
+5. Professor Charlie Curtsinger & Mentor Session
+  
