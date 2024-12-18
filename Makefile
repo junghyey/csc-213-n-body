@@ -14,7 +14,7 @@ generate_bodies: generate_bodies.cu Makefile
 simulate_n_body: simulate_n_body.cu Makefile
 	$(CUDA_CC) $(CFLAGS) -o simulate_n_body simulate_n_body.cu
 
-simulate_n_body_cpu: simulate_n_body_ver1.c Makefile
+simulate_n_body_cpu: simulate_n_body_cpu.c Makefile
 	$(C_CC) $(CFLAGS) -o simulate_n_body_cpu simulate_n_body_cpu.c -lm
 
 

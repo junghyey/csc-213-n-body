@@ -9,8 +9,8 @@
  * The structure to store the information for each individual body
  */
 typedef struct body {
-  double position[3];   // Position in 3D space: [x, y, z]
   double mass;          // Mass of the body
+  double position[3];   // Position in 3D space: [x, y, z]
   double velocity[3];   // Velocity in 3D space: [vx, vy, vz]
   double net_force[3];  // Net force acting on the body in 3D: [Fx, Fy, Fz]
 } body_t;

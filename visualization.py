@@ -71,13 +71,13 @@ def main():
                     ncol = 2)
 
     # Create an animation using the update function
-    ani = FuncAnimation(fig, update, frames = len(time_values), interval =50)
+    ani = FuncAnimation(fig, update, frames = len(time_values), interval = 1)
 
     # Show the animation
     plt.show()
 
     # Save the animation as a GIF
-    ani.save("visualization_real.gif", writer=PillowWriter(fps=30))
+    ani.save("visualization_outputs/visualization_extreme_1.gif", writer=PillowWriter(fps=30))
     
 if __name__ == "__main__":
     main()

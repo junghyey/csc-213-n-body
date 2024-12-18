@@ -162,21 +162,6 @@ __global__ void update_body(double time_step, body_t *n_bodies,
   size_t index = threadIdx.x;
   body_t body = n_bodies[index];
 
-  // Generate "temp" to store current body's information
-  double mass = body.mass;
-  double f_X = body.net_force[0];
-  double f_Y = body.net_force[1];
-  double f_Z = body.net_force[2];
-
-  double v_X = body.velocity[0];
-  double v_Y = body.velocity[1];
-  double v_Z = body.velocity[2];
-
-  // Calculate acceleration F= ma
-  double a_X = f_X / mass;
-  double a_Y = f_Y / mass;
-  double a_Z = f_Z / mass;
-
   // Update positions and velocities
   for (int i = 0; i < 3; i++) {
     n_bodies[index].position[i] += body.velocity[i] * time_step;
