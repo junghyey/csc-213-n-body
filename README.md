@@ -115,7 +115,7 @@ The program reads data from a local `output.csv` file, displays the animation to
 python visualization.py
 ```
 
-** The gif creation code is commented out for this version **
+_The gif creation code is commented out for this version_
 
 ## References
 
