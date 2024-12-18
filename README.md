@@ -115,6 +115,8 @@ The program reads data from a local `output.csv` file, displays the animation to
 python visualization.py
 ```
 
+** The gif creation code is commented out for this version **
+
 ## References
 
 1. Chapter 31. Fast N-Body Simulation with CUDA. (n.d.). NVIDIA Developer. https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda
