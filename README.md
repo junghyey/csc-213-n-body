@@ -99,12 +99,12 @@ The program reads data from a local `output.csv` file, displays the animation to
 
 2. Runs the CUDA simuation for the interactions between 100 bodies with a timestep of 0.1 second and the duration of 10 seconds, using the input data from `random_data.csv`.
 
-Example 2:
+**Example 1:**
 ```bash
 ./simulate_n_body random_data.csv 100 0.1 10
 ```
 
-Example 1:
+**Example 2:**
 ```bash
 ./simulate_n_body inputs/sample_data_1.csv 8 10 10000
 ```
@@ -133,7 +133,7 @@ _The gif creation code is commented out for this version_
 
 3. Wikipedia contributors. (2024, November 21). N-body problem.https://en.wikipedia.org/wiki/N-body_problem
 
-4. CSC213 Lab codes
+4. CSC213 Lab codes (Sudoku Lab)
 
 5. Professor Charlie Curtsinger & Mentor Session
 
