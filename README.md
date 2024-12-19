@@ -120,7 +120,7 @@ python visualization.py
 _The gif creation code is commented out for this version_
 
 
-(Internal Use Only) Runs the CPU implementation of the simulation for 4 bodies.
+(Internal Use Only:Not Expected to be Tested) Runs the CPU implementation of the simulation for 4 bodies.
 
 ```bash
 ./simulate_n_body_cpu
