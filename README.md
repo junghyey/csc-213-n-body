@@ -99,22 +99,32 @@ The program reads data from a local `output.csv` file, displays the animation to
 
 2. Runs the CUDA simuation for the interactions between 100 bodies with a timestep of 0.1 second and the duration of 10 seconds, using the input data from `random_data.csv`.
 
+**Example 1:**
 ```bash
 ./simulate_n_body random_data.csv 100 0.1 10
 ```
 
-3. Runs the CPU implementation of the simulation for 4 bodies.
-
+**Example 2:**
 ```bash
-./simulate_n_body_cpu
+./simulate_n_body inputs/sample_data_1.csv 8 10 10000
 ```
 
-4. Visualizes N-body simulation output from the GPU version.
+Running simulation_n_body.cu creates output.csv file in the current directory (where the simulation_n_body.cu is)
+
+3. Visualizes N-body simulation output (output.csv) from the GPU version.
 
 ```bash
 python visualization.py
 ```
 
+_The gif creation code is commented out for this version_
+
+
+(Internal Use Only) Runs the CPU implementation of the simulation for 4 bodies.
+
+```bash
+./simulate_n_body_cpu
+```
 ## References
 
 1. Chapter 31. Fast N-Body Simulation with CUDA. (n.d.). NVIDIA Developer. https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda
@@ -123,7 +133,8 @@ python visualization.py
 
 3. Wikipedia contributors. (2024, November 21). N-body problem.https://en.wikipedia.org/wiki/N-body_problem
 
-4. CSC213 Lab codes
+4. CSC213 Lab codes (Sudoku Lab)
 
 5. Professor Charlie Curtsinger & Mentor Session
-  
+
+6. visualization.py code source : https://github.com/arpmay/N-body-Problem/blob/main/main.py
